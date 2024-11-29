@@ -2,7 +2,6 @@ package chatgpt
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	openai "github.com/sashabaranov/go-openai"
@@ -35,8 +34,8 @@ func EvaluateTweetSentiment(client *openai.Client, query string, ) (*Result, err
 			Model: openai.GPT4o,
 			Messages: []openai.ChatCompletionMessage{
 				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: "Give a sentiment of this tweet with one word, as well as give a short summary of the tweet.",
+					Role:    openai.ChatMessageRoleSystem,
+					Content: "Identify sentiment of the tweet with one of these words: (✅positive, ❌negative, 🔷neutral), as well as give a short summary of the tweet. For example: 'positive, this tweet is about a new product launch.'",
 				},
 				{
 					Role:    openai.ChatMessageRoleUser,
@@ -62,7 +61,6 @@ func EvaluateTweetSentiment(client *openai.Client, query string, ) (*Result, err
 	if err != nil {
 		log.Fatalf("Unmarshal schema error: %v", err)
 	}
-	fmt.Println(result)
 	return &result, nil
 
 }

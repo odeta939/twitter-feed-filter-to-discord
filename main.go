@@ -6,6 +6,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/michimani/gotwi"
+	"github.com/odeta939/twitter-feed-filter-to-discord/chatgpt"
 	"github.com/odeta939/twitter-feed-filter-to-discord/discord"
 	"github.com/odeta939/twitter-feed-filter-to-discord/twitter"
 )
@@ -18,23 +19,14 @@ func init() {
 	}
 }
 
-var(
-	baseUrl= "https://x.com/"
-	
-)
-
 func main() {
 	//** ChatGPT **//
-	// chatGPTConfig, err := chatgpt.LoadConfig()
-	// if err != nil {
-	// 	log.Fatalf("Failed to load ChatGPT configuration: %v", err)
-	// }
-	// 	twitterConfig, err := twitter.LoadTwitterConfig()
-	// if err != nil {
-	// 	log.Fatalf("Failed to load Twitter configuration: %v", err)
-	// }
+	chatGPTConfig, err := chatgpt.LoadConfig()
+	if err != nil {
+		log.Fatalf("Failed to load ChatGPT configuration: %v", err)
+	}
 
-	// client := chatgpt.GetClient(chatGPTConfig)
+	openaiClient := chatgpt.GetClient(chatGPTConfig)
 
 	
 
@@ -68,13 +60,21 @@ func main() {
 	}
 
 	for _, tweet := range tweets {
-		discord.SendMessage(discoedConfig.ChannelID,  gotwi.StringValue(tweet.Text), discordClient)
-		fmt.Println("------------------------------\n")
-		fmt.Printf("Tweet: %s\n",  gotwi.StringValue(tweet.Text))
-		fmt.Printf("Tweet URL: %s\n", twitter.GetTweetUrl(tweet))
-		fmt.Println("--------------------------------\n")
+		
+		evaluation, err := chatgpt.EvaluateTweetSentiment(openaiClient, gotwi.StringValue(tweet.Text))
+		if err != nil {
+			log.Fatalf("Failed to evaluate tweet sentiment: %v\n", err)
+		}
+
+		discordMessage := GenerateDiscordMessage(*evaluation, twitter.GetTweetUrl(tweet))
+
+		discord.SendMessage(discoedConfig.ChannelID, discordMessage, discordClient)
 	}
 
 	defer discordClient.Close()
 
+}
+
+func GenerateDiscordMessage(evaluation chatgpt.Result, tweetUrl string ) string {
+	return fmt.Sprintf("**%s**\n%s\n %s", evaluation.Sentiment, evaluation.ShortSummary, tweetUrl)
 }
