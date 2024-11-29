@@ -49,8 +49,6 @@ func main() {
 		log.Fatalf("Failed to create Discord client: %v", err)
 	}
 	
-
-
 	//** Twitter **//
 	twitterConfig, err := twitter.LoadTwitterConfig()
 	if err != nil {
