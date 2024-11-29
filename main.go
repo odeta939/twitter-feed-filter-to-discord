@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/michimani/gotwi"
@@ -12,10 +13,18 @@ import (
 )
 
 func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Println("Error loading .env file")
-		return
+	// Check the ENVIRONMENT variable
+	env := os.Getenv("ENVIRONMENT")
+	if env == "dev" {
+		// Load the .env file only in development
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Println("Error loading .env file")
+		} else {
+			log.Println(".env file loaded")
+		}
+	} else {
+		log.Println("Running in production mode; skipping .env file load")
 	}
 }
 
