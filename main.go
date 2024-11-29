@@ -18,7 +18,25 @@ func init() {
 	}
 }
 
+var(
+	baseUrl= "https://x.com/"
+	
+)
+
 func main() {
+	//** ChatGPT **//
+	// chatGPTConfig, err := chatgpt.LoadConfig()
+	// if err != nil {
+	// 	log.Fatalf("Failed to load ChatGPT configuration: %v", err)
+	// }
+	// 	twitterConfig, err := twitter.LoadTwitterConfig()
+	// if err != nil {
+	// 	log.Fatalf("Failed to load Twitter configuration: %v", err)
+	// }
+
+	// client := chatgpt.GetClient(chatGPTConfig)
+
+	
 
 	//** Discord **//
 	discoedConfig, err := discord.LoadDiscordConfig()
@@ -31,8 +49,6 @@ func main() {
 		log.Fatalf("Failed to create Discord client: %v", err)
 	}
 	
-
-	fmt.Println("Discord client successfully initialized!")
 
 
 	//** Twitter **//
@@ -48,14 +64,17 @@ func main() {
 
 	fmt.Println("Twitter client successfully initialized!")
 
-	res, err := twitter.GetRecentTweets(twitterClient, "#authjs")
+	tweets, err := twitter.GetRecentTweets(twitterClient, "#authjs OR #nextauth")
 	if err != nil {
-		log.Fatalf("Failed to get recent tweets: %v", err)
+		log.Fatalf("Failed to get recent tweets: %v\n", err)
 	}
 
-	for _, tweet := range res.Data {
+	for _, tweet := range tweets {
 		discord.SendMessage(discoedConfig.ChannelID,  gotwi.StringValue(tweet.Text), discordClient)
+		fmt.Println("------------------------------\n")
 		fmt.Printf("Tweet: %s\n",  gotwi.StringValue(tweet.Text))
+		fmt.Printf("Tweet URL: %s\n", twitter.GetTweetUrl(tweet))
+		fmt.Println("--------------------------------\n")
 	}
 
 	defer discordClient.Close()

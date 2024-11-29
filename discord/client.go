@@ -26,12 +26,11 @@ func GetClient(config *Config) (*discordgo.Session, error) {
 	return discord , nil;
 }
 
-func SendMessage( channelID string, message string, discord *discordgo.Session) (error) {
+func SendMessage( channelID string, message string, discord *discordgo.Session) (*discordgo.Message, error) {
 	sentMessage, err := discord.ChannelMessageSend(channelID, message)
 	if err != nil {
 		fmt.Println("Error sending message")
-		return fmt.Errorf("failed to send message: %w", err)
+		return nil, fmt.Errorf("failed to send message: %w", err)
 	}
-	fmt.Println("Message sent: ", sentMessage.Content)
-	return nil
+	return sentMessage, nil
 }
