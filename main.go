@@ -81,6 +81,8 @@ func main() {
 	}
 
 	defer discordClient.Close()
+	// Wait here to keep the program running
+	select {}
 
 }
 
